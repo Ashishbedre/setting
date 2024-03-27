@@ -53,7 +53,7 @@ public class FileServiceImp implements FileService {
                 minioClient.putObject(
                         PutObjectArgs.builder()
                                 .bucket(bucketName)
-                                .object(newFilename)
+                                .object(newFilename+".png")
                                 .stream(file.getInputStream(), file.getSize(), -1)
                                 .contentType(file.getContentType())
                                 .build());
@@ -75,16 +75,25 @@ public class FileServiceImp implements FileService {
 
     public ResponseEntity<byte[]> downloadFile(String tenant) {
         try {
+            tenant=tenant+".png";
             InputStream stream;
             String actualFileName;
 
-            // Check if the requested file exists in the bucket
-            boolean fileExists = minioClient.statObject(
-                    StatObjectArgs.builder()
-                            .bucket(bucketName)
-                            .object(tenant)
-                            .build()
-            ) != null;
+            boolean fileExists;
+            try {
+                fileExists = minioClient.statObject(
+                        StatObjectArgs.builder()
+                                .bucket(bucketName)
+                                .object(tenant)
+                                .build()
+                ) != null;
+            } catch (ErrorResponseException e) {
+                fileExists = false;
+            } catch (InvalidKeyException | NoSuchAlgorithmException | IOException | ServerException | XmlParserException | InsufficientDataException | InternalException e) {
+                e.printStackTrace();
+                fileExists = false;
+            }
+
 
             if (fileExists) {
                 // If the file exists, get the actual file
@@ -123,6 +132,7 @@ public class FileServiceImp implements FileService {
     @Override
     public void remove(String tenant) {
         try {
+            tenant=tenant+".png";
             minioClient.removeObject(
                     RemoveObjectArgs.builder()
                             .bucket(bucketName)

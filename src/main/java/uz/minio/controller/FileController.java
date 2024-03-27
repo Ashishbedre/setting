@@ -11,7 +11,7 @@ import uz.minio.service.FileService;
 
 
 @RestController
-@RequestMapping("/app-minio")
+    @RequestMapping("/settings/company-logo")
 public class FileController {
 
     @Autowired

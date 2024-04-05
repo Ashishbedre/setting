@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import uz.minio.controller.FileController;
+import uz.minio.dto.FileResponse;
 import uz.minio.service.FileService;
 
 import java.io.IOException;
@@ -73,7 +74,7 @@ public class FileServiceImp implements FileService {
 
 
 
-    public ResponseEntity<byte[]> downloadFile(String tenant) {
+    public FileResponse downloadFile(String tenant) {
         try {
             tenant=tenant+".png";
             InputStream stream;
@@ -116,16 +117,18 @@ public class FileServiceImp implements FileService {
             }
 
             byte[] fileContent = IOUtils.toByteArray(stream);
+//            FileResponse fileResponse = new FileResponse(actualFileName, fileContent);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
             headers.setContentDispositionFormData("attachment", actualFileName);
             headers.setContentLength(fileContent.length);
 
-            return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+            return new FileResponse(actualFileName, fileContent);
         } catch (IOException | NoSuchAlgorithmException | InvalidKeyException | MinioException e) {
             logger.error("Error occurred while downloading file: {}", e.getMessage(), e);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -169,4 +172,8 @@ public class FileServiceImp implements FileService {
 //        }
 //
 //    }
+
 }
+
+
+

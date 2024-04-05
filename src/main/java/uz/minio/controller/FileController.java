@@ -7,27 +7,29 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import uz.minio.dto.FileResponse;
 import uz.minio.service.FileService;
 
 
 @RestController
-    @RequestMapping("/settings/company-logo")
+@RequestMapping("/settings/company-logo")
+@CrossOrigin
 public class FileController {
 
     @Autowired
     private FileService fileService;
 
-    @PostMapping("/upload/{tenant}")
+    @PostMapping("/upload/tenant={tenant}")
     public String uploadFile(@RequestParam("file") MultipartFile file,@PathVariable String tenant) {
         return fileService.uploadFile(file,tenant);
     }
 
-    @GetMapping("download/{tenant}")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable String tenant) {
+    @GetMapping("download/tenant={tenant}")
+    public FileResponse downloadFile(@PathVariable String tenant) {
         return fileService.downloadFile(tenant);
     }
 
-    @DeleteMapping("delete/{tenant}")
+    @DeleteMapping("delete/tenant={tenant}")
     public ResponseEntity<?> removeFile(@PathVariable String tenant){
         fileService.remove(tenant);
         return new ResponseEntity<>(HttpStatus.OK);
